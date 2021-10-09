@@ -1,4 +1,5 @@
 import sys, random
+import numpy as np
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -63,12 +64,42 @@ class CanvasWidget(QWidget):
         QWidget.__init__(self)        
         self.setMouseTracking(True)
 
+        # some settings
+        self.backgroundColor = QColor(20,20,20)
+        self.gridColor = QColor(25,25,25)
+        self.showGrid = True
+        self.gridSpacing = 10
+
     def paintEvent(self, e):
         ''' . '''
         p = QPainter()
         p.begin(self)
-        self.drawElements(p)
+        self.drawBackground(p)
+        self.drawCanvasElements(p)
         p.end()
+
+    def drawBackground(self, p):
+        size = self.size()
+
+        # background color
+        p.fillRect(0, 0, size.width(), size.height(), self.backgroundColor)
+
+        # draw the grid
+        if self.showGrid:
+            # gridLines = np.array([None]*(size.width()/self.gridSpacing-1)) # number of vertical lines
+            gridLines = []
+
+            # vertical lines
+            for lx in range(self.gridSpacing, size.width(), self.gridSpacing):
+                gridLines.append(QLineF(lx, 0, lx, size.height()))
+            # horizontal lines
+            for ly in range(self.gridSpacing, size.height(), self.gridSpacing):
+                gridLines.append(QLineF(0, ly, size.width(), ly))
+            p.setPen(self.gridColor)
+            p.drawLines(gridLines)
+
+    def drawCanvasElements(self, p):
+        pass
 
     def drawPoints(self, p):
         p.setPen(Qt.red)
