@@ -7,6 +7,12 @@ from PyQt5.QtGui import *
 
 from GUI.Application import Ui_MainWindow
 
+
+class AppState:
+    def __init__(self):
+        pass
+
+
 '''
 Wrapper for the main window UI.
 '''
@@ -19,13 +25,18 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.setTitle()
 
+        # App state
+
+        self.state = AppState()
+        self.state.tool = (255,0,0)
+
         # Actions
 
         self.ui.actionExit.triggered.connect(self.close)
 
         size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         self.ui.canvasLayout = QVBoxLayout(self.ui.rightCol)
-        self.canvas = CanvasWidget()
+        self.canvas = CanvasWidget(self.state)
         self.canvas.setSizePolicy(size)
         self.ui.canvasLayout.addWidget(self.canvas)
 
@@ -41,7 +52,22 @@ class MainWindow(QMainWindow):
         # Signals
 
         self.canvas.sigMouseMoved.connect(self.setMouseCoords) # connect mouse movement from the canvas
+        self.ui.tool1.clicked.connect(lambda e: self.selectTool(1, e))
+        self.ui.tool2.clicked.connect(lambda e: self.selectTool(2, e))
+        self.ui.tool3.clicked.connect(lambda e: self.selectTool(3, e))
+        self.ui.tool4.clicked.connect(lambda e: self.selectTool(4, e))
+        self.ui.tool5.clicked.connect(lambda e: self.selectTool(5, e))
+        self.ui.tool6.clicked.connect(lambda e: self.selectTool(6, e))
 
+
+    def selectTool(self, tool, e):
+        if tool == 1:
+            self.state.tool = (255,0,0)
+        elif tool == 2:
+            self.state.tool = (0,255,0)
+        elif tool == 3:
+            self.state.tool = (0,0,255)
+        self.statusCurrentTarget.setText("Tool " + str(tool))
 
     @pyqtSlot('QMouseEvent')
     def setMouseCoords(self, QMouseEvent):
@@ -56,19 +82,46 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle(title)
 
+class CanvasElement:
+    def __init__(self, name, color):
+        self.name = name
+        self.color = color
+        self.x = 0
+        self.y = 0
+        self.enabled = False
+        self.width = 40
+        self.height = 40
+
+    def place(self, x, y):
+        self.setPosition(x, y)
+        self.enabled = True
+
+    def setPosition(self, x, y):
+        self.x = x - self.width//2
+        self.y = y - self.width//2
 
 class CanvasWidget(QWidget):
     sigMouseMoved = pyqtSignal(QMouseEvent, name='mouseMoved')
 
-    def __init__(self):
+    def __init__(self, app):
         QWidget.__init__(self)        
         self.setMouseTracking(True)
+        self.app = app
 
         # some settings
         self.backgroundColor = QColor(20,20,20)
         self.gridColor = QColor(25,25,25)
         self.showGrid = True
         self.gridSpacing = 10
+
+        self.elements = []
+
+    def placeElement(self, x, y):
+        lastElemId = len(self.elements)
+        elem = CanvasElement("Element #"+ str(lastElemId + 1), QColor(*self.app.tool))
+        elem.place(x, y) # should be: schema.place(elem)
+        self.elements.append(elem)
+        self.repaint()
 
     def paintEvent(self, e):
         ''' . '''
@@ -99,7 +152,10 @@ class CanvasWidget(QWidget):
             p.drawLines(gridLines)
 
     def drawCanvasElements(self, p):
-        pass
+        for elem in self.elements:
+            if elem.color != p.pen().color():
+                p.setPen(elem.color)
+            p.drawRect(QRectF(elem.x, elem.y, elem.width, elem.height))
 
     def drawPoints(self, p):
         p.setPen(Qt.red)
@@ -118,12 +174,17 @@ class CanvasWidget(QWidget):
     def mouseMoveEvent(self, QMouseEvent):
         ''' QMouseEvent '''
         mPos = QMouseEvent.localPos()
-        print(mPos.x(), mPos.y())
         self.sigMouseMoved.emit(QMouseEvent)
 
-    def keyPressEvent(self, QKeyEvent):
-        ''' QKeyEvent '''
-        print("key!")
+    def mousePressEvent(self, QMouseEvent):
+        ''' QMouseEvent '''
+        self.mPressPos = QMouseEvent.localPos()
+
+    def mouseReleaseEvent(self, QMouseEvent):
+        ''' QMouseEvent '''
+        mPos = QMouseEvent.localPos()
+        if mPos == self.mPressPos:
+            self.placeElement(mPos.x(), mPos.y())
 
 
 if __name__ == "__main__":

@@ -48,7 +48,7 @@ grid.state = [
 	activeElement: <Wire4>
 ]
 
-class Cigol:
+class Scigol:
 	...
 	def handleRightClick(self):
 		mpos = pg.mouse.get_pos()

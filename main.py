@@ -1,4 +1,4 @@
-from Cigol import *
+from Scigol import *
 
 schema = Schema()
 src1 = SourcePort()
