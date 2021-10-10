@@ -1,18 +1,30 @@
 # Planning & design
 
-## Hierarchy
+## Classes
 * **Node**
 * Node/**Input**
 * Node/**Output**
 * **Element**
 * Element/**Port**
+* Element/Port/**AndPort**
+* Element/Port/**OrPort**
+* Element/Port/**SourcePort**
+* Element/Port/**OutputPort**
 * Element/**Wire**
 * Element/**Annotation**
 * Element/Annotation/**Text**
+* **Schema**
 * **Circuit**
 * **Grid**
+
+## Hierarchy
+* **Grid**
   * **Schema**
-    * Element/**\***
+    * **Text(x,y,"Some text")**
+    * **SourcePort**
+      * **Output**
+    * **AndPort**
+      * **Input**, **Input**, **Output**
 
 ```
 Grid:           Interface between user events and simulation. Captures mouse/keyboard
@@ -22,7 +34,7 @@ Schema:         (Or simulation) takes care of the actual logic and simulation. H
 
 Node:           A point on the grid that has a state (0/1/unknown). Inputs and outputs
                 are extensions of nodes having a state as well. Wires are collections
-                of nodes.
+                of nodes. Node is a basic simulation element.
 Element:        Port, Wire, Annotation and everything that goes to the grid, is
                 a special case of an element. Element always has grid coordinates.
 Port:           An elementary gate that takes one or more inputs and converts them
