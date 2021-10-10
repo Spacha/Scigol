@@ -1,17 +1,18 @@
 # Planning & design
 
 ## Hierarchy
-* Node
-  * Input
-  * Output
-* Grid
-  * Schema
-    * Element
-      * Port
-      * Wire
-      * Annotation
-        * Text
-      * Circuit
+* **Node**
+* Node/**Input**
+* Node/**Output**
+* **Element**
+* Element/**Port**
+* Element/**Wire**
+* Element/**Annotation**
+* Element/Annotation/**Text**
+* **Circuit**
+* **Grid**
+  * **Schema**
+    * Element/**\***
 
 ```
 Grid:           Interface between user events and simulation. Captures mouse/keyboard
