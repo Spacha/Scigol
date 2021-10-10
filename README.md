@@ -1,6 +1,9 @@
 # Planning & design
 
 ## Hierarchy
+* Node
+  * Input
+  * Output
 * Grid
   * Schema
     * Element
@@ -11,17 +14,20 @@
       * Circuit
 
 ```
-Grid: 		Interface between user events and simulation. Captures mouse/keyboard
-			events, interprets them and sends and modifies schema if needed.
-Schema: 	(Or simulation) takes care of the actual logic and simulation. Holds
-			information of all elements, wires etc.
-Element: 	Port, Wire, Annotation and everything that goes to the grid, is
-			a special case of an element. Element always has grid coordinates.
-Port: 		An elementary gate that takes one or more inputs and converts them
-			to one output.
-Wire: 		Series of lines on the grid that connects with elements. One wire
-			always has a deterministic state (0/1) and so have all inputs that
-			are connected to it.
+Grid:           Interface between user events and simulation. Captures mouse/keyboard
+                events, interprets them and sends and modifies schema if needed.
+Schema:         (Or simulation) takes care of the actual logic and simulation. Holds
+                information of all elements, wires etc.
+
+Node:           A point on the grid that has a state (0/1/unknown). Inputs and outputs
+                are extensions of nodes having a state as well. Wires are collections
+                of nodes.
+Element:        Port, Wire, Annotation and everything that goes to the grid, is
+                a special case of an element. Element always has grid coordinates.
+Port:           An elementary gate that takes one or more inputs and converts them
+                to one output.
+Wire:           Series of segments on the grid that connects with nodes of all types.
+                Wire connects nodes so that they share a state.
 ```
 
 ## Connections
