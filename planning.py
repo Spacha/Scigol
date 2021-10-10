@@ -9,11 +9,13 @@ schema.wires = [<Wire1>,<Wire2>,...]
 
 class Wire:
 	# Nodes are grid points
-	nodes = [
-		(10,10),	<-- start
-		(12,10),
-		(12,40),
-		(12,30)		<-- end
+	# Segments are pairs of grid points (nodes). A segment is a line that connects two points.
+	segments = [
+		((0,0),(0,2)),
+		((0,2),(1,2)),
+		((1,1),(1,2)),
+		((1,2),(1,3)),
+		((1,3),(2,3))
 	]
 
 Grid

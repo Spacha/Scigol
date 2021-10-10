@@ -124,7 +124,9 @@ class CanvasWidget(QWidget):
         self.repaint()
 
     def paintEvent(self, e):
-        ''' . '''
+        '''
+            How do we save the canvas so that we wouldn't have to re'draw it every time we pan, zoom etc?
+        '''
         p = QPainter()
         p.begin(self)
         self.drawBackground(p)
