@@ -52,7 +52,7 @@ Drawing stuff. Takes care of the "physical" properties of connections (wires), p
 
 We have port with input and output nodes: `port_nodes = port.inputs + [port.output] = [(0,0),(0,2),(2,1)]`. 
 To rotate it `a = 90` degrees clockwise, we need to make a simple matrix multiplication with rotation matrix R:
-````
+```
 R = / cos(a) -sin(a) \   /x\
     \ sin(a)  cos(a) / * \y/
 ```
