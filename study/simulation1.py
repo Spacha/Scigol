@@ -64,9 +64,9 @@ class Segment:
         nums = range(int(self.length()) + 1)
         if exclude_nodes:
             nums = nums[1:-1] # drop first and last (= nodes)
-        for i in range(int(self.length()) + 1):
+        for i in nums:
             points.append(self.start + i*delta)
-        return []
+        return points
 
 ''' Collection of segments. '''
 class Wire:
@@ -103,7 +103,7 @@ class Wire:
                 nodes.append(segment.start)
             if segment.end not in nodes:
                 nodes.append(segment.end)
-        return (nodes)
+        return nodes
 
 
 class PortType:
@@ -222,32 +222,49 @@ class Schema:
 
         # check if there are common nodes with existing wires
         # if so, just add these nodes to the other wire (only distinct ones)
-        removables = []
         for existing_wire in self.wires:
+            # TODO: might be good to use linked list to make removing more efficient!
             points = existing_wire.getPoints()
             for node in wire.getNodes():
                 if node in points: # ok, wire and existing_wire should be merged
                     print("Overlapping wires!")
-                    removables.append(existing_wire)
-                    self.mergeWires(wire,existing_wire)
+                    self.mergeWires(existing_wire,wire)
+                    del self.wires[self.wires.index(existing_wire)]
                     break # next wire
 
-        if len(removables) > 0: # need to merge
-            # TODO: might be good to use linked list to make removing more efficient!
-            # remove the existing ones as they have been merged to the new one
-            for w in removables:
-                del self.wires[self.wires.index(w)]
-
-                #del self.wires[self.wires.index(w)]
         self.wires.append(wire)
-        #print(self.wires)
 
     def mergeWires(self, w1, w2):
+        # merge: w1 + w2 --> w2
+        w2nodes = w2.getNodes()
         for s in w1.segments:
-            for p1 in s.getPoints(exclude_nodes=True):
-                for node in w2.getNodes():
-                    if node == p1:
-                        print(node.toTuple())
+            print("s")
+            handled = False
+            for w2node in w2nodes:
+                print("w2node")
+                if w2node in [s.start, s.end]: # nodes of w1.segment[i]
+                    if s not in w2.segments:
+                        w2.segments.append(s) # nodal
+                        print("added nodal segment")
+                    handled = True
+                else: 
+                    for p1 in s.getPoints(exclude_nodes=True): # midpoints of w1.segment[i]
+                        if w2node == p1: # need to split segment s
+                            split1 = self.segmentBetween(s.start.toTuple(), p1.toTuple())
+                            split2 = self.segmentBetween(p1.toTuple(), s.end.toTuple())
+                            del w1.segments[w1.segments.index(s)]
+                            del self.segments[self.segments.index(s)]
+                            w2.segments += [split1, split2]
+                            handled = True
+                            break # next point
+            if not handled:
+                if s not in w2.segments:
+                    w2.segments.append(s) # non-overlapping
+                    print("added non-overlapping segment")
+            #w2.segments.append(s)
+        #print(w1.segments)
+        #print(w2.segments)
+
 
 
     def nodeIn(self, x, y):
@@ -303,13 +320,23 @@ class Schema:
 startTime = time.time()
 
 schema = Schema()
+print("--- 1 ---")
 schema.addWire([
     ((2,0),(2,1)),
     ((2,1),(4,1))
 ])
+print("--- 2 ---")
 schema.addWire([
     ((2,0),(2,1)),
     ((2,1),(4,1))
+])
+print("--- 3 ---")
+schema.addWire([
+    ((4,1),(4,0))
+])
+print("--- 4 ---")
+schema.addWire([
+    ((3,1),(3,2))
 ])
 print("----------------------------------")
 print( schema.report() )
