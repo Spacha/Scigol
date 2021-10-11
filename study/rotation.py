@@ -23,6 +23,7 @@ class QVector2D(QVector2D):
 
 
 class AndPort:
+
     def __init__(self, inputs=2):
         self.inputs = []
         centerPoint = QVector2D(1,1) # offset relative to top-left corner of the component

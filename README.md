@@ -1,37 +1,45 @@
 # Planning & design
 
 ## Classes
-* **Node**
-* Node/**Input**
-* Node/**Output**
-* **Element**
-* Element/**Port**
-* Element/Port/**AndPort**
-* Element/Port/**OrPort**
-* Element/Port/**SourcePort**
-* Element/Port/**OutputPort**
-* Element/**Wire**
-* Element/**Annotation**
-* Element/Annotation/**Text**
+* **GridElement**
+* GridElement/**Node**
+* GridElement/Node/**Input**
+* GridElement/Node/**Output**
+* GridElement/**Port**
+* GridElement/Port/**AndPort**
+* GridElement/Port/**OrPort**
+* GridElement/Port/**SourcePort**
+* GridElement/Port/**OutputPort**
+* GridElement/**Wire**
+* GridElement/**Annotation**
+* GridElement/Annotation/**Text**
 * **Schema**
 * **Circuit**
 * **Grid**
 
 ## Hierarchy
-* **Grid**
-  * **Schema**
-    * **Text(x,y,"Some text")**
-    * **SourcePort**
-      * **Output**
-    * **AndPort**
-      * **Input**, **Input**, **Output**
+* Grid
+  * Schema
+    * Text(x,y,"Some text")
+    * SourcePort
+      * Output
+    * AndPort
+      * Input, Input, Output
+    * Wire
+      * Segment
+        * Node, Node
 
 ```
 Grid:           Interface between user events and simulation. Captures mouse/keyboard
                 events, interprets them and sends and modifies schema if needed.
 Schema:         (Or simulation) takes care of the actual logic and simulation. Holds
                 information of all elements, wires etc.
-
+                Schema is used from outside using:
+                  * QVector2D or QPoint (= grid position)
+                  * Wire (segmentoids)
+                    * schema.addWire()
+                  * Port/*
+                    * schema.addPort()
 Node:           A point on the grid that has a state (0/1/unknown). Inputs and outputs
                 are extensions of nodes having a state as well. Wires are collections
                 of nodes. Node is a basic simulation element.
@@ -90,3 +98,7 @@ Fundamentally, only one of the 4 ways mentioned in the "Connections" section, bu
 ## Backend
 
 Takes care of running the simulations. Requires a valid graph (i.e. no output-output connections, )
+
+## Ideas for performance
+
+* Save nodes and segments in a certain way to speed up search. E.g. ascending in some sense.
