@@ -102,3 +102,5 @@ Takes care of running the simulations. Requires a valid graph (i.e. no output-ou
 ## Ideas for performance
 
 * Save nodes and segments in a certain way to speed up search. E.g. ascending in some sense.
+* Separate renderer thread. This is a **must**. The Qt painting process must take a separate painter thread which is communicated with using status flags (e.g. `repaint = True`).
+* Draw port symbols on startup _once_ and save the drawing to the port statically -> fast blitting/drawing.
