@@ -27,10 +27,16 @@ class NumpyMap:
         self.store = np.empty((self.sizeX, self.sizeY), dtype=Node)
 
     def get_node(self, x, y):
-        if x >= self.sizeX or y >= self.sizeY:
-            # extend the map (most likely very expensive)
-            pass
-        node = self.store[x][y]
+        try:
+            '''
+            if x >= self.sizeX or y >= self.sizeY:
+                # extend the map (most likely very expensive)
+                pass
+            '''
+            node = self.store[x][y]
+        except:
+            return # extend the map...
+
         if node is None:
             self.store[x][y] = Node(x,y)
             return self.store[x][y]

@@ -7,6 +7,7 @@ def flatten(l):
 '''
 https://www.geeksforgeeks.org/hash-map-in-python
 '''
+'''
 class HashMap:
     def __init__(self, size):
         self.size = size
@@ -64,13 +65,14 @@ class HashMap:
             bucket[index] = (key, val)
         else:
             bucket.append((key, val))
+'''
 
 def pointKey(x,y):
     ''' https://stackoverflow.com/a/26981910/3081830; limits: 2^16 => [-65536, 65535] '''
     return (x << 16) + y
 def lineKey(p1,p2):
     return (pointKey(*p1) << 16) + pointKey(*p2)
-
+'''
 class HashMap2D(HashMap):
     def __init__(self, size):
         super().__init__(size)
@@ -80,6 +82,26 @@ class HashMap2D(HashMap):
         return super().getItem( self._getKey(x,y) )
     def setItem(self, x, y, val):
         super().setItem( self._getKey(x,y), val )
+'''
+class HashMap2D: # memory cannot be pre-allocated
+    def __init__(self):
+        # self.obj = type(obj) # if we want on-demand type of hashmap...
+        self.items = dict()
+    def getItem(self, x, y):
+        try:
+            node = self.items[x,y]
+        except KeyError:
+            # create new
+            node = Node(x,y)
+            self.setItem(x, y, node)
+            return node
+    def setItem(self, x, y, val):
+        self.items[x,y] = val
+    def __getitem__(self, p):       # overloads: items[x,y]
+        x,y = p
+        return self.items[x,y]       # p = (x,y)
+    def __setitem__(self, p, val):  # overloads: items[x,y] = val
+        self.items[x,y] = val
 
 class GridElement:
     def __init__(self, x, y):
@@ -266,8 +288,10 @@ class Config:
     initialPorts = 128
 class Schema:
     def __init__(self):
-        self.nodes = HashMap2D(Config.initialNodes)
-        self.segments = HashMap2D(Config.initialSegments)
+        #self.nodes = HashMap2D(Config.initialNodes)
+        #self.segments = HashMap2D(Config.initialSegments)
+        self.nodes = HashMap2D()
+        self.segments = HashMap2D()
         self.wires = []
         self.ports = []
 
@@ -394,13 +418,6 @@ class Benchmark:
             p1,p2 = ((a,b),(a,c)) if random.randint(0,1) == 0 else ((b,a),(c,a))
             self.segments.append( Segment(p1,p2) )
 
-    def benchmark_nodeAt(self):
-        s = time.time()
-        for i in range(self.N):
-            n = schema.nodeAt(random.randint(0,100)-50, random.randint(0,100)-50)
-        print(n)
-        print((time.time()-s)*1E6/self.N) # 135 ms = 13.5 us per node
-
     def bm_segment_comparison(self):
         times = []
         for i in range(self.N):
@@ -410,7 +427,16 @@ class Benchmark:
             same = s1 == s2
             times.append(time.time()-s)
         print("Segment comparison: ", end='')
-        print(sum(times)*1E6/self.N) # ~1 us per segment comparison
+        print(sum(times)*1E6/self.N, "us") # ~1 us per segment comparison
+
+    def bm_nodeAt(self):
+        s = time.time()
+        schema = Schema()
+        for i in range(self.N):
+            n = schema.nodeAt(random.randint(0,100)-50, random.randint(0,100)-50)
+        print(n)
+        print("Segment nodeAt(): ", end='')
+        print((time.time()-s)*1E6/self.N, "us") # 135 ms = 13.5 us per node
 
     def bm_segment_getKey(self):
         times = []
@@ -420,7 +446,7 @@ class Benchmark:
             s1.getKey()
             times.append(time.time()-s)
         print("Segment getKey(): ", end='')
-        print(sum(times)*1E6/self.N) # ~1 us per segment comparison
+        print(sum(times)*1E6/self.N, "us") # ~1 us per segment comparison
 
     def bm_segment_getHash(self):
         times = []
@@ -430,7 +456,7 @@ class Benchmark:
             s1.getHash()
             times.append(time.time()-s)
         print("Segment getHash(): ", end='')
-        print(sum(times)*1E6/self.N) # ~1 us per segment comparison
+        print(sum(times)*1E6/self.N, "us") # ~1 us per segment comparison
 
     def bm_getPoints(self):
         times = []
@@ -441,22 +467,30 @@ class Benchmark:
             s1.getPoints(excludeNodes)
             times.append(time.time()-s)
 
-        print(sum(times)*1E6/self.N)
+        print("Segment getPoints(): ", end='')
+        print(sum(times)*1E6/self.N, "us")
 
     def bm_addWire(self):
         times = []
         schema = Schema()
         for i in range(self.N):
             sx = [self.segmentoids[random.randint(0,99)] for _ in range(3)]
+            print(sx)
+            return
             s = time.time()
             schema.addWire(sx)
             times.append(time.time()-s)
 
-        print(sum(times)*1E6/self.N)
+        print("Segment addWire(): ", end='')
+        print(sum(times)*1E6/self.N, "us")
 
 bm = Benchmark()
-# bm.bm_getPoints()
-# bm.bm_addWire()
+#bm.bm_nodeAt()
+#bm.bm_segment_comparison()
+#bm.bm_segment_getKey()
+#bm.bm_segment_getHash()
+#bm.bm_getPoints()
+#bm.bm_addWire()
 #s = Segment((0,1),(0,5))
 #print(s.getPoints())
 #s = Segment((-4,3),(2,3))

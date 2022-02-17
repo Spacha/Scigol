@@ -158,11 +158,11 @@ if __name__ == "__main__":
     print("Final memory use: {} bytes".format(sys.getsizeof(n)))
 
     # HashTable:
-    # - New nodes:      ~300 us per 100 new nodes
-    # - Existing nodes: ~200 us per 100 existing nodes
+    # - New nodes:      ~200 us per 100 new nodes
+    # - Existing nodes: ~100 us per 100 existing nodes
     # - Memory usage:   21084 bytes (with initialized length)
     #
     # HashTable (no pre-initialized table):
-    # - New nodes:      ~700 us per 100 new nodes       (!)
+    # - New nodes:      ~417 us per 100 new nodes       (!)
     # - Existing nodes: no change
     # - Memory usage:   132 bytes                       (!)
