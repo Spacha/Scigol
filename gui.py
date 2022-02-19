@@ -1,5 +1,6 @@
 import sys, random
 import numpy as np
+import time
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -97,8 +98,8 @@ class CanvasElement:
         self.enabled = True
 
     def setPosition(self, x, y):
-        self.x = x - self.width//2
-        self.y = y - self.width//2
+        self.x = x - self.width // 2
+        self.y = y - self.width //2
 
 class CanvasWidget(QWidget):
     sigMouseMoved = pyqtSignal(QMouseEvent, name='mouseMoved')
@@ -127,11 +128,13 @@ class CanvasWidget(QWidget):
         '''
             How do we save the canvas so that we wouldn't have to re'draw it every time we pan, zoom etc?
         '''
+        startTime = time.time()
         p = QPainter()
         p.begin(self)
         self.drawBackground(p)
         self.drawCanvasElements(p)
         p.end()
+        print( time.time() - startTime )
 
     def drawBackground(self, p):
         size = self.size()
